@@ -13,9 +13,14 @@ public class Main {
     tx.begin();
 
     try {
+      Team team = new Team();
+      team.setName("testTeam");
+      em.persist(team);
+
       Member member = new Member();
       member.setUsername("test");
       member.setAge(10);
+      member.setTeam(team);
       em.persist(member);
 
       // # Type Query : 반환 타입이 명확한 경우 사용
@@ -34,6 +39,22 @@ public class Main {
       TypedQuery<Member> query  = em.createQuery("select m from Member m where m.username = :username",Member.class);
       query.setParameter("username", "test");
       query.getSingleResult();
+
+      // 페이징
+      // - setFirstResult : 조회 시작 위치
+      // - setMaxResult : 조회 마지막 위치
+      List<Member> pageResult = em.createQuery("select m from Member m order by m.age desc", Member.class)
+          .setFirstResult(0)
+            .setMaxResults(10)
+              .getResultList();
+      for (Member member1 : pageResult) {
+        System.out.println(member1);
+      }
+
+      // 조인
+      String joinQuery = "select m from Member m join m.team t";
+      List<Member> joinResult = em.createQuery(joinQuery, Member.class)
+        .getResultList();
 
       tx.commit();
     } catch (Exception e) {

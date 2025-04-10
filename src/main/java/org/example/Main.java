@@ -56,6 +56,12 @@ public class Main {
       List<Member> joinResult = em.createQuery(joinQuery, Member.class)
         .getResultList();
 
+      // 경로표현식
+      // 1. 상태필드 : 경로 탐색의 끝. 탐색 X
+      // 2. 단일 값 연관 경로 : 묵시적 내부 조인발생. 탐색 O
+      // 3. 컬렉션 값 연관 경로 : 묵시적 내부 조인발생. 탐색 X
+      // 실무에서 쿼리튜닝이 어렵기 때문에 웬만하면 묵시적 조인이 발생하게는 하면 안된다. 직관적인게 좋음.
+
       tx.commit();
     } catch (Exception e) {
       tx.rollback();

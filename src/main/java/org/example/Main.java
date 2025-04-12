@@ -62,6 +62,26 @@ public class Main {
       // 3. 컬렉션 값 연관 경로 : 묵시적 내부 조인발생. 탐색 X
       // 실무에서 쿼리튜닝이 어렵기 때문에 웬만하면 묵시적 조인이 발생하게는 하면 안된다. 직관적인게 좋음.
 
+      // 페치 조인 (Fetch Join) - SQL의 종류는 아니다.
+      // JPQL에서 성능최적화를 위해 제공
+      // 연관된 엔티티/컬렉션을 SQL 한번에 함께 조회하는 기능
+      // join fetch 명령어를 사용
+
+      // 페치 조인의 특징
+      // 1. 연관된 엔티티들을 SQL 한번으로 조회 - 성능최적화
+      // 2. 엔티티에 직접 적용하는 글로벌 로딩 전략보다 우선시 됨 ( Entity 컬럼에 @OneToMany(fetch = FetchType.LAZY) )
+      // 3. 실무에서 글로벌 로딩 전략은 모두 지연로딩
+      // 4. 최적화가 필요한 곳은 페치 조인을 적용
+
+      // 페치 조인의 한계
+      // 1. 둘 이상의 컬렉션은 페치 조인 할 수 없다.
+      // 2. 컬렉션을 페치 조인하면 페이징 API 를 사용할 수 없다.
+
+      // ex - SQL : select m.*, t.* from Member m inner join team t on m.team_id = t.id
+      String fetchJoinQuery = "select m from Member m join fetch m.team";
+      List<Member> fetchJoinResult = em.createQuery(fetchJoinQuery, Member.class)
+          .getResultList();
+
       tx.commit();
     } catch (Exception e) {
       tx.rollback();
